@@ -4,9 +4,9 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
 /**
- * Class CreateFriendshipsGroupsTable
+ * Class CreateFriendshipGroupMembersTable
  */
-class CreateFriendshipsGroupsTable extends Migration
+class CreateFriendshipGroupMembersTable extends Migration
 {
 
     public function up()
@@ -21,7 +21,10 @@ class CreateFriendshipsGroupsTable extends Migration
                 ->references('id')
                 ->on(config('friendships.tables.fr_pivot'))
                 ->onDelete('cascade');
-
+            $table->foreign('group_id')
+                ->references('id')
+                ->on(config('friendships.tables.fr_groups'))
+                ->onDelete('cascade');
             $table->unique(['friendship_id', 'friend_id', 'friend_type', 'group_id'], 'unique');
         });
 

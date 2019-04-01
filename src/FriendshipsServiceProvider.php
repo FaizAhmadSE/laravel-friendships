@@ -14,7 +14,7 @@ class FriendshipsServiceProvider extends ServiceProvider
     public function boot()
     {
 
-        if (class_exists('CreateFriendshipsTable') || class_exists('CreateFriendshipsGroupsTable')) {
+        if (class_exists('CreateFriendshipsTable')) {
             return;
         }
 
@@ -23,7 +23,8 @@ class FriendshipsServiceProvider extends ServiceProvider
 
         $this->publishes([
             $stub . 'create_friendships_table.php' => $target . date('Y_m_d_His', time()) . '_create_friendships_table.php',
-            $stub . 'create_friendships_groups_table.php' => $target . date('Y_m_d_His', time() + 1) . '_create_friendships_groups_table.php',
+            $stub . 'create_friendship_groups_table.php' => $target . date('Y_m_d_His', time() + 1) . '_create_friendship_groups_table.php',
+            $stub . 'create_friendship_group_members_table.php' => $target . date('Y_m_d_His', time() + 2) . '_create_friendship_group_members_table.php',
         ], 'migrations');
 
         $this->publishes([

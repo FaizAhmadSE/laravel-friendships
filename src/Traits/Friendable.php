@@ -2,8 +2,9 @@
 
 namespace Hootlex\Friendships\Traits;
 
-use Hootlex\Friendships\Models\FriendFriendshipGroups;
 use Hootlex\Friendships\Models\Friendship;
+use Hootlex\Friendships\Models\FriendshipGroup;
+use Hootlex\Friendships\Models\FriendshipGroupMembership;
 use Hootlex\Friendships\Status;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
@@ -160,20 +161,24 @@ trait Friendable
      * @param $groupSlug
      * @return bool
      */
-    public function groupFriend(Model $friend, $groupSlug)
+    public function groupFriend(Model $friend, $group)
     {
         $friendship = $this->findFriendship($friend)->whereStatus(Status::ACCEPTED)->first();
-        $groupsAvailable = config('friendships.groups', []);
-        if (!isset($groupsAvailable[$groupSlug]) || empty($friendship)) {
+        $group = FriendshipGroup::firstOrCreate(
+            ['slug' => str_slug($group)],
+            ['name' => $group]
+        );
+
+        if (empty($group)) {
             return false;
         }
-        $group = $friendship->groups()->firstOrCreate([
+        $groupMembership = $friendship->groupMemberships()->firstOrCreate([
             'friendship_id' => $friendship->id,
-            'group_id' => $groupsAvailable[$groupSlug],
+            'group_id' => $group->id,
             'friend_id' => $friend->getKey(),
             'friend_type' => $friend->getMorphClass(),
         ]);
-        return $group->wasRecentlyCreated;
+        return $groupMembership->wasRecentlyCreated;
     }
 
     /**
@@ -196,7 +201,7 @@ trait Friendable
         if ('' !== $groupSlug && isset($groupsAvailable[$groupSlug])) {
             $where['group_id'] = $groupsAvailable[$groupSlug];
         }
-        $result = $friendship->groups()->where($where)->delete();
+        $result = $friendship->groupMemberships()->where($where)->delete();
         return $result;
     }
 
@@ -358,9 +363,9 @@ trait Friendable
     /**
      * @return \Illuminate\Database\Eloquent\Relations\MorphMany
      */
-    public function groups()
+    public function groupMemberships()
     {
-        return $this->morphMany(FriendFriendshipGroups::class, 'friend');
+        return $this->morphMany(FriendshipGroupMembership::class, 'friend');
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace Hootlex\Friendships\Models;
 
+use Hootlex\Friendships\Models\FriendshipGroupMembership;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -45,9 +46,9 @@ class Friendship extends Model
     /**
      * @return \Illuminate\Database\Eloquent\Relations\hasMany
      */
-    public function groups()
+    public function groupMemberships()
     {
-        return $this->hasMany(FriendFriendshipGroups::class, 'friendship_id');
+        return $this->hasMany(FriendshipGroupMembership::class, 'friendship_id');
     }
 
     /**
@@ -90,26 +91,22 @@ class Friendship extends Model
      * @param string $groupSlug
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function scopeWhereGroup($query, $model, $groupSlug)
+    public function scopeWhereGroup($query, $model, $group)
     {
 
-        $groupsPivotTable = config('friendships.tables.fr_groups_pivot');
+        $groupUserPivotTable = config('friendships.tables.fr_groups_pivot');
+        $groupsTable = config('friendships.tables.fr_groups');
         $friendsPivotTable = config('friendships.tables.fr_pivot');
-        $groupsAvailable = config('friendships.groups', []);
 
-        if ('' !== $groupSlug) {
-
-            $groupId = isset($groupsAvailable[$groupSlug]) ? $groupsAvailable[$groupSlug] : -1;
-
-            $query->join($groupsPivotTable, function ($join) use ($groupsPivotTable, $friendsPivotTable, $groupId, $model) {
-                $join->on($groupsPivotTable . '.friendship_id', '=', $friendsPivotTable . '.id')
-                    ->where($groupsPivotTable . '.group_id', '=', $groupId)
-                    ->where(function ($query) use ($groupsPivotTable, $friendsPivotTable, $model) {
-                        $query->where($groupsPivotTable . '.friend_id', '!=', $model->getKey())
-                            ->where($groupsPivotTable . '.friend_type', '=', $model->getMorphClass());
-                    })
-                    ->orWhere($groupsPivotTable . '.friend_type', '!=', $model->getMorphClass());
-            });
+        if (!empty($group)) {
+            $query->join($groupUserPivotTable, $groupUserPivotTable . '.friendship_id', '=', $friendsPivotTable . '.id')
+                ->join($groupsTable, $groupsTable . '.id', '=', $groupUserPivotTable . '.group_id')
+                ->where($groupsTable . '.slug', '=', $group)
+                ->where(function ($query) use ($groupUserPivotTable, $friendsPivotTable, $model) {
+                    $query->where($groupUserPivotTable . '.friend_id', '!=', $model->getKey())
+                        ->where($groupUserPivotTable . '.friend_type', '=', $model->getMorphClass());
+                })
+                ->orWhere($groupUserPivotTable . '.friend_type', '!=', $model->getMorphClass());
 
         }
 

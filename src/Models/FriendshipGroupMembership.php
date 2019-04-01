@@ -5,10 +5,10 @@ namespace Hootlex\Friendships\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Class FriendFriendshipGroups
+ * Class FriendshipGroup
  * @package Hootlex\Friendships\Models
  */
-class FriendFriendshipGroups extends Model
+class FriendshipGroupMembership extends Model
 {
     /**
      * @var array
@@ -29,5 +29,4 @@ class FriendFriendshipGroups extends Model
 
         parent::__construct($attributes);
     }
-
 }
