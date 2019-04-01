@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 
 /**
  * Class CreateFriendshipsGroupsTable
@@ -9,8 +9,8 @@ use Illuminate\Database\Migrations\Migration;
 class CreateFriendshipsGroupsTable extends Migration
 {
 
-    public function up() {
-
+    public function up()
+    {
         Schema::create(config('friendships.tables.fr_groups_pivot'), function (Blueprint $table) {
 
             $table->integer('friendship_id')->unsigned();
@@ -23,12 +23,12 @@ class CreateFriendshipsGroupsTable extends Migration
                 ->onDelete('cascade');
 
             $table->unique(['friendship_id', 'friend_id', 'friend_type', 'group_id'], 'unique');
-
         });
 
     }
 
-    public function down() {
+    public function down()
+    {
         Schema::dropIfExists(config('friendships.tables.fr_groups_pivot'));
     }
 

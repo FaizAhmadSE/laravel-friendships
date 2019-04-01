@@ -1,13 +1,12 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 
 class CreateFriendshipsTable extends Migration
 {
-
-    public function up() {
-
+    public function up()
+    {
         Schema::create(config('friendships.tables.fr_pivot'), function (Blueprint $table) {
             $table->increments('id');
             $table->morphs('sender');
@@ -15,11 +14,10 @@ class CreateFriendshipsTable extends Migration
             $table->tinyInteger('status')->default(0);
             $table->timestamps();
         });
-
     }
 
-    public function down() {
+    public function down()
+    {
         Schema::dropIfExists(config('friendships.tables.fr_pivot'));
     }
-
 }

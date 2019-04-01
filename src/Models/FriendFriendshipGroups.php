@@ -2,7 +2,6 @@
 
 namespace Hootlex\Friendships\Models;
 
-use Hootlex\Friendships\Status;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -11,7 +10,6 @@ use Illuminate\Database\Eloquent\Model;
  */
 class FriendFriendshipGroups extends Model
 {
-
     /**
      * @var array
      */

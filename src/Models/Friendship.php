@@ -2,7 +2,6 @@
 
 namespace Hootlex\Friendships\Models;
 
-use Hootlex\Friendships\Status;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -46,7 +45,8 @@ class Friendship extends Model
     /**
      * @return \Illuminate\Database\Eloquent\Relations\hasMany
      */
-    public function groups() {
+    public function groups()
+    {
         return $this->hasMany(FriendFriendshipGroups::class, 'friendship_id');
     }
 
@@ -58,7 +58,7 @@ class Friendship extends Model
     {
         return $this->fill([
             'recipient_id' => $recipient->getKey(),
-            'recipient_type' => $recipient->getMorphClass()
+            'recipient_type' => $recipient->getMorphClass(),
         ]);
     }
 
@@ -93,13 +93,13 @@ class Friendship extends Model
     public function scopeWhereGroup($query, $model, $groupSlug)
     {
 
-        $groupsPivotTable   = config('friendships.tables.fr_groups_pivot');
-        $friendsPivotTable  = config('friendships.tables.fr_pivot');
+        $groupsPivotTable = config('friendships.tables.fr_groups_pivot');
+        $friendsPivotTable = config('friendships.tables.fr_pivot');
         $groupsAvailable = config('friendships.groups', []);
 
-        if ('' !== $groupSlug && isset($groupsAvailable[$groupSlug])) {
+        if ('' !== $groupSlug) {
 
-            $groupId = $groupsAvailable[$groupSlug];
+            $groupId = isset($groupsAvailable[$groupSlug]) ? $groupsAvailable[$groupSlug] : -1;
 
             $query->join($groupsPivotTable, function ($join) use ($groupsPivotTable, $friendsPivotTable, $groupId, $model) {
                 $join->on($groupsPivotTable . '.friendship_id', '=', $friendsPivotTable . '.id')
@@ -125,7 +125,7 @@ class Friendship extends Model
      */
     public function scopeBetweenModels($query, $sender, $recipient)
     {
-        $query->where(function ($queryIn) use ($sender, $recipient){
+        $query->where(function ($queryIn) use ($sender, $recipient) {
             $queryIn->where(function ($q) use ($sender, $recipient) {
                 $q->whereSender($sender)->whereRecipient($recipient);
             })->orWhere(function ($q) use ($sender, $recipient) {
