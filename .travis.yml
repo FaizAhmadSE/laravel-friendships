@@ -4,7 +4,8 @@ services:
   - mysql
 
 php:
-  - 7.1.3
+  - 7.1
+  - 7.3
 
 addons:
   code_climate:
@@ -19,7 +20,7 @@ cache:
     - $HOME/.composer/cache
 
 install:
-  - COMPOSER_DISCARD_CHANGES=1 composer install --prefer-source --no-interaction
+  - COMPOSER_DISCARD_CHANGES=1 composer install --dev --prefer-source --no-interaction
 
 before_script:
   - mysql -u root -e 'set global innodb_large_prefix=1;'
@@ -33,10 +34,10 @@ before_script:
   - yes | cp tests/config/friendships.php vendor/laravel/laravel/config/friendships.php
   - yes | cp tests/Stub_User.php vendor/laravel/laravel/app/User.php
   - cd vendor/laravel/laravel
-  - composer update --prefer-source --no-interaction
+  - composer update --dev --prefer-source --no-interaction
   - perl -pi -w -e "s/'engine' => null,/'engine' => 'InnoDB ROW_FORMAT=DYNAMIC',/g;" config/database.php
-  - php artisan migrate | yes
-  - Yes | cd -
+  - php artisan migrate
+  - cd -
 
 script:
   - vendor/bin/phpunit
