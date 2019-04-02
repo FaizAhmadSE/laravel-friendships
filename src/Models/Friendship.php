@@ -102,7 +102,7 @@ class Friendship extends Model
             $query->join($groupUserPivotTable, $groupUserPivotTable . '.friendship_id', '=', $friendsPivotTable . '.id')
                 ->join($groupsTable, $groupsTable . '.id', '=', $groupUserPivotTable . '.group_id')
                 ->where($groupsTable . '.slug', '=', $group)
-                ->where(function ($query) use ($groupUserPivotTable, $friendsPivotTable, $model) {
+                ->where(function ($query) use ($groupUserPivotTable, $model) {
                     $query->where($groupUserPivotTable . '.friend_id', '!=', $model->getKey())
                         ->where($groupUserPivotTable . '.friend_type', '=', $model->getMorphClass());
                 })

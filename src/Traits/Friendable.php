@@ -164,6 +164,9 @@ trait Friendable
     public function groupFriend(Model $friend, $group)
     {
         $friendship = $this->findFriendship($friend)->whereStatus(Status::ACCEPTED)->first();
+        if (empty( $friendship)) {
+            return false;
+        }
         $group = FriendshipGroup::firstOrCreate(
             ['slug' => str_slug($group)],
             ['name' => $group]
@@ -186,21 +189,19 @@ trait Friendable
      * @param $groupSlug
      * @return bool
      */
-    public function ungroupFriend(Model $friend, $groupSlug = '')
+    public function ungroupFriend(Model $friend, $group)
     {
         $friendship = $this->findFriendship($friend)->first();
-        $groupsAvailable = config('friendships.groups', []);
-        if (empty($friendship)) {
+        $group = FriendshipGroup::whereSlug(str_slug($group))->first();
+        if (empty($friendship) || empty($group)) {
             return false;
         }
         $where = [
             'friendship_id' => $friendship->id,
             'friend_id' => $friend->getKey(),
             'friend_type' => $friend->getMorphClass(),
+            'group_id' => $group->id,
         ];
-        if ('' !== $groupSlug && isset($groupsAvailable[$groupSlug])) {
-            $where['group_id'] = $groupsAvailable[$groupSlug];
-        }
         $result = $friendship->groupMemberships()->where($where)->delete();
         return $result;
     }
