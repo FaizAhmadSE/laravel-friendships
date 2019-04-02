@@ -13,56 +13,56 @@ class FriendshipsTest extends TestCase
     /** @test */
     public function user_can_send_a_friend_request()
     {
-        $sender    = createUser();
-        $recipient = createUser();
+        $sender = factory(\App\Models\User::class)->create();
+        $recipient = factory(\App\Models\User::class)->create();
         
         $sender->befriend($recipient);
         
-        $this->assertCount(1, $recipient->getFriendRequests());
+        $this->assertCount(1, $recipient->getIncomingPendingRequests());
     }
     
     /** @test */
     public function user_can_not_send_a_friend_request_if_frienship_is_pending()
     {
-        $sender    = createUser();
-        $recipient = createUser();
+        $sender = factory(\App\Models\User::class)->create();
+        $recipient = factory(\App\Models\User::class)->create();
         $sender->befriend($recipient);
         $sender->befriend($recipient);
         $sender->befriend($recipient);
         
-        $this->assertCount(1, $recipient->getFriendRequests());
+        $this->assertCount(1, $recipient->getIncomingPendingRequests());
     }
     
     
     /** @test */
     public function user_can_send_a_friend_request_if_frienship_is_denied()
     {
-        $sender    = createUser();
-        $recipient = createUser();
+        $sender = factory(\App\Models\User::class)->create();
+        $recipient = factory(\App\Models\User::class)->create();
         
         $sender->befriend($recipient);
         $recipient->denyFriendRequest($sender);
         
         $sender->befriend($recipient);
         
-        $this->assertCount(1, $recipient->getFriendRequests());
+        $this->assertCount(1, $recipient-> getIncomingPendingRequests());
     }
 
     /** @test */
     public function user_can_remove_a_friend_request()
     {
-        $sender    = createUser();
-        $recipient = createUser();
+        $sender = factory(\App\Models\User::class)->create();
+        $recipient = factory(\App\Models\User::class)->create();
 
         $sender->befriend($recipient);
-        $this->assertCount(1, $recipient->getFriendRequests());
+        $this->assertCount(1, $recipient->getIncomingPendingRequests());
 
         $sender->unfriend($recipient);
-        $this->assertCount(0, $recipient->getFriendRequests());
+        $this->assertCount(0, $recipient->getIncomingPendingRequests());
 
         // Can resend friend request after deleted
         $sender->befriend($recipient);
-        $this->assertCount(1, $recipient->getFriendRequests());
+        $this->assertCount(1, $recipient->getIncomingPendingRequests());
 
         $recipient->acceptFriendRequest($sender);
         $this->assertEquals(true, $recipient->isFriendWith($sender));
@@ -74,8 +74,8 @@ class FriendshipsTest extends TestCase
     /** @test */
     public function user_is_friend_with_another_user_if_accepts_a_friend_request()
     {
-        $sender    = createUser();
-        $recipient = createUser();
+        $sender = factory(\App\Models\User::class)->create();
+        $recipient = factory(\App\Models\User::class)->create();
         //send fr
         $sender->befriend($recipient);
         //accept fr
@@ -84,14 +84,14 @@ class FriendshipsTest extends TestCase
         $this->assertTrue($recipient->isFriendWith($sender));
         $this->assertTrue($sender->isFriendWith($recipient));
         //fr has been delete
-        $this->assertCount(0, $recipient->getFriendRequests());
+        $this->assertCount(0, $recipient->getIncomingPendingRequests());
     }
     
     /** @test */
     public function user_is_not_friend_with_another_user_until_he_accepts_a_friend_request()
     {
-        $sender    = createUser();
-        $recipient = createUser();
+        $sender = factory(\App\Models\User::class)->create();
+        $recipient = factory(\App\Models\User::class)->create();
         //send fr
         $sender->befriend($recipient);
         
@@ -102,8 +102,8 @@ class FriendshipsTest extends TestCase
     /** @test */
     public function user_has_friend_request_from_another_user_if_he_received_a_friend_request()
     {
-        $sender    = createUser();
-        $recipient = createUser();
+        $sender = factory(\App\Models\User::class)->create();
+        $recipient = factory(\App\Models\User::class)->create();
         //send fr
         $sender->befriend($recipient);
         
@@ -114,8 +114,8 @@ class FriendshipsTest extends TestCase
     /** @test */
     public function user_has_sent_friend_request_to_this_user_if_he_already_sent_request()
     {
-        $sender    = createUser();
-        $recipient = createUser();
+        $sender = factory(\App\Models\User::class)->create();
+        $recipient = factory(\App\Models\User::class)->create();
         //send fr
         $sender->befriend($recipient);
 
@@ -126,8 +126,8 @@ class FriendshipsTest extends TestCase
     /** @test */
     public function user_has_not_friend_request_from_another_user_if_he_accepted_the_friend_request()
     {
-        $sender    = createUser();
-        $recipient = createUser();
+        $sender = factory(\App\Models\User::class)->create();
+        $recipient = factory(\App\Models\User::class)->create();
         //send fr
         $sender->befriend($recipient);
         //accept fr
@@ -140,8 +140,8 @@ class FriendshipsTest extends TestCase
     /** @test */
     public function user_cannot_accept_his_own_friend_request()
     {
-        $sender    = createUser();
-        $recipient = createUser();
+        $sender = factory(\App\Models\User::class)->create();
+        $recipient = factory(\App\Models\User::class)->create();
         
         //send fr
         $sender->befriend($recipient);
@@ -153,8 +153,8 @@ class FriendshipsTest extends TestCase
     /** @test */
     public function user_can_deny_a_friend_request()
     {
-        $sender    = createUser();
-        $recipient = createUser();
+        $sender = factory(\App\Models\User::class)->create();
+        $recipient = factory(\App\Models\User::class)->create();
         $sender->befriend($recipient);
         
         $recipient->denyFriendRequest($sender);
@@ -162,15 +162,15 @@ class FriendshipsTest extends TestCase
         $this->assertFalse($recipient->isFriendWith($sender));
         
         //fr has been delete
-        $this->assertCount(0, $recipient->getFriendRequests());
+        $this->assertCount(0, $recipient->getIncomingPendingRequests());
         $this->assertCount(1, $sender->getDeniedFriendships());
     }
     
     /** @test */
     public function user_can_block_another_user()
     {
-        $sender    = createUser();
-        $recipient = createUser();
+        $sender = factory(\App\Models\User::class)->create();
+        $recipient = factory(\App\Models\User::class)->create();
         
         $sender->blockFriend($recipient);
         
@@ -184,8 +184,8 @@ class FriendshipsTest extends TestCase
     /** @test */
     public function user_can_unblock_a_blocked_user()
     {
-        $sender    = createUser();
-        $recipient = createUser();
+        $sender = factory(\App\Models\User::class)->create();
+        $recipient = factory(\App\Models\User::class)->create();
         
         $sender->blockFriend($recipient);
         $sender->unblockFriend($recipient);
@@ -197,8 +197,8 @@ class FriendshipsTest extends TestCase
     /** @test */
     public function user_block_is_permanent_unless_blocker_decides_to_unblock()
     {
-        $sender    = createUser();
-        $recipient = createUser();
+        $sender = factory(\App\Models\User::class)->create();
+        $recipient = factory(\App\Models\User::class)->create();
         
         $sender->blockFriend($recipient);
         $this->assertTrue($recipient->isBlockedBy($sender));
@@ -223,21 +223,21 @@ class FriendshipsTest extends TestCase
     /** @test */
     public function user_can_send_friend_request_to_user_who_is_blocked()
     {
-        $sender    = createUser();
-        $recipient = createUser();
+        $sender = factory(\App\Models\User::class)->create();
+        $recipient = factory(\App\Models\User::class)->create();
         
         $sender->blockFriend($recipient);
         $sender->befriend($recipient);
         $sender->befriend($recipient);
         
-        $this->assertCount(1, $recipient->getFriendRequests());
+        $this->assertCount(1, $recipient-> getIncomingPendingRequests());
     }
     
     /** @test */
     public function it_returns_all_user_friendships()
     {
-        $sender     = createUser();
-        $recipients = createUser([], 3);
+        $sender = factory(\App\Models\User::class)->create();
+        $recipients = factory(\App\Models\User::class,3)->create();
         
         foreach ($recipients as $recipient) {
             $sender->befriend($recipient);
@@ -252,8 +252,8 @@ class FriendshipsTest extends TestCase
     /** @test */
     public function it_returns_accepted_user_friendships_number()
     {
-        $sender     = createUser();
-        $recipients = createUser([], 3);
+        $sender = factory(\App\Models\User::class)->create();
+        $recipients = factory(\App\Models\User::class,3)->create();
         
         foreach ($recipients as $recipient) {
             $sender->befriend($recipient);
@@ -268,8 +268,8 @@ class FriendshipsTest extends TestCase
     /** @test */
     public function it_returns_accepted_user_friendships()
     {
-        $sender     = createUser();
-        $recipients = createUser([], 3);
+        $sender = factory(\App\Models\User::class)->create();
+        $recipients = factory(\App\Models\User::class,3)->create();
         
         foreach ($recipients as $recipient) {
             $sender->befriend($recipient);
@@ -284,8 +284,8 @@ class FriendshipsTest extends TestCase
     /** @test */
     public function it_returns_only_accepted_user_friendships()
     {
-        $sender     = createUser();
-        $recipients = createUser([], 4);
+        $sender = factory(\App\Models\User::class)->create();
+        $recipients = factory(\App\Models\User::class,4)->create();
         
         foreach ($recipients as $recipient) {
             $sender->befriend($recipient);
@@ -305,8 +305,8 @@ class FriendshipsTest extends TestCase
     /** @test */
     public function it_returns_pending_user_friendships()
     {
-        $sender     = createUser();
-        $recipients = createUser([], 3);
+        $sender = factory(\App\Models\User::class)->create();
+        $recipients = factory(\App\Models\User::class,3)->create();
         
         foreach ($recipients as $recipient) {
             $sender->befriend($recipient);
@@ -319,8 +319,8 @@ class FriendshipsTest extends TestCase
     /** @test */
     public function it_returns_denied_user_friendships()
     {
-        $sender     = createUser();
-        $recipients = createUser([], 3);
+        $sender = factory(\App\Models\User::class)->create();
+        $recipients = factory(\App\Models\User::class,3)->create();
         
         foreach ($recipients as $recipient) {
             $sender->befriend($recipient);
@@ -335,8 +335,8 @@ class FriendshipsTest extends TestCase
     /** @test */
     public function it_returns_blocked_user_friendships()
     {
-        $sender     = createUser();
-        $recipients = createUser([], 3);
+        $sender = factory(\App\Models\User::class)->create();
+        $recipients = factory(\App\Models\User::class,3)->create();
         
         foreach ($recipients as $recipient) {
             $sender->befriend($recipient);
@@ -351,8 +351,8 @@ class FriendshipsTest extends TestCase
     /** @test */
     public function it_returns_user_friends()
     {
-        $sender     = createUser();
-        $recipients = createUser([], 4);
+        $sender = factory(\App\Models\User::class)->create();
+        $recipients = factory(\App\Models\User::class,4)->create();
         
         foreach ($recipients as $recipient) {
             $sender->befriend($recipient);
@@ -373,8 +373,8 @@ class FriendshipsTest extends TestCase
     /** @test */
     public function it_returns_user_friends_per_page()
     {
-        $sender     = createUser();
-        $recipients = createUser([], 6);
+        $sender = factory(\App\Models\User::class)->create();
+        $recipients = factory(\App\Models\User::class,6)->create();
         
         foreach ($recipients as $recipient) {
             $sender->befriend($recipient);
@@ -400,9 +400,9 @@ class FriendshipsTest extends TestCase
     /** @test */
     public function it_returns_user_friends_of_friends()
     {
-        $sender     = createUser();
-        $recipients = createUser([], 2);
-        $fofs       = createUser([], 5)->chunk(3);
+        $sender = factory(\App\Models\User::class)->create();
+        $recipients = factory(\App\Models\User::class,2)->create();
+        $fofs       = factory(\App\Models\User::class,5)->create()->chunk(3);
         
         foreach ($recipients as $recipient) {
             $sender->befriend($recipient);
@@ -427,9 +427,9 @@ class FriendshipsTest extends TestCase
     /** @test */
     public function it_returns_user_mutual_friends()
     {
-        $sender     = createUser();
-        $recipients = createUser([], 2);
-        $fofs       = createUser([], 5)->chunk(3);
+        $sender     = factory(\App\Models\User::class)->create();
+        $recipients = factory(\App\Models\User::class,2)->create();
+        $fofs       = factory(\App\Models\User::class,5)->create()->chunk(3);
 
         foreach ($recipients as $recipient) {
             $sender->befriend($recipient);
@@ -456,9 +456,9 @@ class FriendshipsTest extends TestCase
     /** @test */
     public function it_returns_user_mutual_friends_per_page()
     {
-        $sender     = createUser();
-        $recipients = createUser([], 2);
-        $fofs       = createUser([], 8)->chunk(5);
+        $sender     = factory(\App\Models\User::class)->create();
+        $recipients = factory(\App\Models\User::class,2)->create();
+        $fofs       = factory(\App\Models\User::class,8)->create()->chunk(5);
 
         foreach ($recipients as $recipient) {
             $sender->befriend($recipient);
@@ -488,9 +488,9 @@ class FriendshipsTest extends TestCase
     /** @test */
     public function it_returns_user_mutual_friends_number()
     {
-        $sender     = createUser();
-        $recipients = createUser([], 2);
-        $fofs       = createUser([], 5)->chunk(3);
+        $sender     = factory(\App\Models\User::class)->create();
+        $recipients = factory(\App\Models\User::class,2)->create();;
+        $fofs       = factory(\App\Models\User::class,5)->create()->chunk(3);
 
         foreach ($recipients as $recipient) {
             $sender->befriend($recipient);
