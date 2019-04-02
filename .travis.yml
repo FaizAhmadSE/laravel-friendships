@@ -4,12 +4,11 @@ services:
   - mysql
 
 php:
-  - 5.6
-  - 7.0
+  - 7.1.3
 
 addons:
-    code_climate:
-        repo_token: bb9681de04daca830a87c3eb0f6500b0a815f8262107fec833e0852df2401466
+  code_climate:
+    repo_token: bb9681de04daca830a87c3eb0f6500b0a815f8262107fec833e0852df2401466
 
 sudo: false
 
@@ -28,8 +27,9 @@ before_script:
   - mysql -u root -e 'set global innodb_file_format_max="Barracuda";'
   - mysql -u root -e 'set global innodb_file_per_table=true;'
   - mysql -e 'create database friendships_test;'
-  - cp src/database/migrations/create_friendships_table.php vendor/laravel/laravel/database/migrations/2015_11_19_053825_create_friendships_table.php
-  - yes | cp src/database/migrations/create_friendships_groups_table.php vendor/laravel/laravel/database/migrations/2015_11_19_053826_create_friendships_groups_table.php
+  - cp src/database/migrations/create_friendships_table.php vendor/laravel/laravel/database/migrations/2015_11_19_053826_create_friendships_table.php
+  - yes | cp src/database/migrations/create_friendship_groups_table.php vendor/laravel/laravel/database/migrations/2015_11_19_053826_create_friendship_groups_table.php
+  - yes | cp src/database/migrations/create_friendship_group_members_table.php vendor/laravel/laravel/database/migrations/2015_11_19_053825_create_friendship_group_members_table.php
   - yes | cp tests/config/friendships.php vendor/laravel/laravel/config/friendships.php
   - yes | cp tests/Stub_User.php vendor/laravel/laravel/app/User.php
   - cd vendor/laravel/laravel

@@ -15,8 +15,8 @@ class FriendshipsGroupsTest extends TestCase
     public function user_can_add_a_friend_to_a_group()
     {
 
-        $sender = factory(\App\Models\User::class)->create();
-        $recipient = factory(\App\Models\User::class)->create();
+        $sender = factory(\App\User::class)->create();
+        $recipient = factory(\App\User::class)->create();
 
         $sender->befriend($recipient);
         $recipient->acceptFriendRequest($sender);
