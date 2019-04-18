@@ -7,7 +7,6 @@ use Hootlex\Friendships\Models\FriendshipGroup;
 use Hootlex\Friendships\Models\FriendshipGroupMembership;
 use Hootlex\Friendships\Status;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 
 /**
@@ -164,7 +163,7 @@ trait Friendable
     public function groupFriend(Model $friend, $group)
     {
         $friendship = $this->findFriendship($friend)->whereStatus(Status::ACCEPTED)->first();
-        if (empty( $friendship)) {
+        if (empty($friendship)) {
             return false;
         }
         $group = FriendshipGroup::firstOrCreate(
@@ -272,9 +271,9 @@ trait Friendable
      */
     public function getIncomingPendingRequests()
     {
-        $requests = Friendship::whereRecipient($this)->whereStatus(Status::PENDING)->with('sender', )->get();
+        $requests = Friendship::whereRecipient($this)->whereStatus(Status::PENDING)->with('sender')->get()->pluck('sender');
         $requests->map(function ($request) {
-            $mutual = $this->getMutualFriendsCount($request->sender);
+            $mutual = $this->getMutualFriendsCount($request);
             $request['mutualFriends'] = $mutual;
             return $request;
         });
@@ -322,9 +321,10 @@ trait Friendable
      */
     public function getMutualFriendsCount($other)
     {
-        return Cache::has($this->id . '-mutualFriendsCount-' . $other->id)
-        ? Cache::get($this->id . '-mutualFriendsCount-' . $other->id) :
-        Cache::put($this->id . '-mutualFriendsCount-' . $other->id, $this->getMutualFriendsQueryBuilder($other)->count(), 3600);
+        // return Cache::has($this->id . '-mutualFriendsCount-' . $other->id)
+        // ? Cache::get($this->id . '-mutualFriendsCount-' . $other->id) :
+        // Cache::put($this->id . '-mutualFriendsCount-' . $other->id, $this->getMutualFriendsQueryBuilder($other)->count(), 3600);
+        return $this->getMutualFriendsQueryBuilder($other)->count();
     }
 
     /**
