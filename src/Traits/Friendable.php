@@ -300,6 +300,13 @@ trait Friendable
     {
         return $this->getOrPaginate($this->getFriendsQueryBuilder($groupSlug), $perPage);
     }
+    public function getFriendsIDs($groupSlug = ""){
+        $friendships = $this->findFriendships(Status::ACCEPTED, $groupSlug)->get(['sender_id', 'recipient_id']);
+        $recipients = $friendships->pluck('recipient_id')->all();
+        $senders = $friendships->pluck('sender_id')->all();
+        $friends = array_unique(array_merge($recipients, $senders));
+        return $friends;
+    }
 
     /**
      * This method will not return Friendship models
@@ -435,10 +442,8 @@ trait Friendable
      */
     private function getFriendsQueryBuilder($groupSlug = '')
     {
-        $friendships = $this->findFriendships(Status::ACCEPTED, $groupSlug)->get(['sender_id', 'recipient_id']);
-        $recipients = $friendships->pluck('recipient_id')->all();
-        $senders = $friendships->pluck('sender_id')->all();
-        return $this->where('id', '!=', $this->getKey())->whereIn('id', array_merge($recipients, $senders));
+        $friends = array_diff($this->getFriendsIDs($groupSlug), array($this->getKey()));
+        return $this->whereIn('id', $friends);
     }
 
     /**
