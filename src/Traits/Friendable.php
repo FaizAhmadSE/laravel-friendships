@@ -305,7 +305,7 @@ trait Friendable
         $recipients = $friendships->pluck('recipient_id')->all();
         $senders = $friendships->pluck('sender_id')->all();
         $friends = array_unique(array_merge($recipients, $senders));
-        return $friends;
+        return array_diff($friends, array($this->getKey()));
     }
 
     /**
@@ -442,8 +442,7 @@ trait Friendable
      */
     private function getFriendsQueryBuilder($groupSlug = '')
     {
-        $friends = array_diff($this->getFriendsIDs($groupSlug), array($this->getKey()));
-        return $this->whereIn('id', $friends);
+        return $this->whereIn('id', $this->getFriendsIDs($groupSlug));
     }
 
     /**
